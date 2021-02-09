@@ -1,0 +1,14 @@
+#theme
+/devcamper_theme
+
+#data
+/_data
+
+#md file
+devcamper_specs.md
+links.md
+
+#npm packege
+/devcamper_api/node_modules
+devcamper_api/config/config.env
+.DS_Store
