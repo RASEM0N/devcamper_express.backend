@@ -9,12 +9,15 @@ const app = express();
 /* привзяка действий по маршруту localhost:5000/
  * или просто localhost:5000*/
 app.get('/', (req, res) => {
-    /*Не надо вводить Headers key
-     * express сам определит к какому типу относиться*/
-
-    // res.send({ name: 'Brad' });
-    // res.json({ name: 'Brad' });
-    res.send('<h1>Hello from express</h1>');
+    // res.sendStatus(400);
+    // res.status(400).json({ success: false });
+    res.status(200).json({
+        success: true,
+        data: {
+            id: 1,
+            name: 'Roman',
+        },
+    });
 });
 
 const PORT = process.env.PORT || 5000;
