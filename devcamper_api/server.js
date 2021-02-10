@@ -17,6 +17,12 @@ connectDB();
 
 const app = express();
 
+// Body parser
+/* Можем постить.
+ * Принимаем json в качастве запроса
+ * req.body */
+app.use(express.json());
+
 // Dev loggin middleware
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
