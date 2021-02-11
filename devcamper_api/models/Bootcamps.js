@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const slugify = require('slugify');
 // типа валидация
 const BootcampsScheme = new mongoose.Schema({
     name: {
@@ -106,6 +106,17 @@ const BootcampsScheme = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+});
+
+// Create bootcamp slug from the name
+/* Будет запускаться до
+ * операции -save- документа
+ * this.* - * берется из Схемы*/
+BootcampsScheme.pre('save', function (next) {
+    this.slug = slugify(this.name, {
+        lower: true,
+    });
+    next();
 });
 
 module.exports = mongoose.model('Bootcamp', BootcampsScheme);
