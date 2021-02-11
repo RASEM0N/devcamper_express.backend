@@ -6,6 +6,7 @@ const ErrorHandler = require('./middleware/error.js');
 const colors = require('colors');
 // Middleware
 const morgan = require('morgan');
+const logger = require('./middleware/logger.js');
 // Router files
 const bootcamps = require('./routes/bootcamps.js');
 //#endregion *************************************
@@ -27,6 +28,7 @@ app.use(express.json());
 // Dev loggin middleware
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
+    // app.use(logger);
 }
 
 // Mount routers
