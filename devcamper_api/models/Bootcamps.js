@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-// типа валидация
+const geocoder = require('../utils/geocoder');
+
+// типа валидация, схема
 const BootcampsScheme = new mongoose.Schema({
     name: {
         type: String,
@@ -117,6 +119,35 @@ BootcampsScheme.pre('save', function (next) {
         lower: true,
     });
     next();
+});
+
+// Geocode & create location field
+BootcampsScheme.pre('save', async function (next) {
+    const loc = await geocoder.geocode(this.address);
+    const {
+        longitude,
+        latitude,
+        formattedAddress,
+        streetName,
+        city,
+        stateCode,
+        zipcode,
+        countryCode,
+    } = loc[0];
+
+    this.location = {
+        type: 'Point',
+        coordinates: [longitude, latitude],
+        formattedAddress: formattedAddress,
+        street: streetName,
+        city: city,
+        state: stateCode,
+        zipcode: zipcode,
+        country: countryCode,
+    };
+
+    // Do not save address in DB
+    this.address = undefined;
 });
 
 module.exports = mongoose.model('Bootcamp', BootcampsScheme);
