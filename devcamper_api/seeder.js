@@ -51,6 +51,5 @@ const deletetData = async () => {
 /* Запускаем в консоли через node seeder -i или -d.
  * Все .pre остаются в рабочем состояние*/
 if (process.argv[2] === '-i') {
-    console.log(`-i`);
     importData();
 } else if (process.argv[2] === '-d') deletetData();
