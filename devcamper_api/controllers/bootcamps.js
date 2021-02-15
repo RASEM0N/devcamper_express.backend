@@ -7,15 +7,53 @@ const ErrorResponce = require('../utils/errorResponce.js');
 // @route       GET /api/v1/bootcamps
 // @access      Public
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
-    let query;
+    // Copy qyery
+    const reqQuery = { ...req.query };
+
+    // Fileds to exclude
+    const removeField = ['select', 'sort'];
+
+    // Loop over removeFields and delete them from reqQuery
+    /* Удаляем где есть одно из
+     * значений массива removeFiled,
+     * чтоб они не входили в запрос и не как не влияли
+     * на результат, до нужного момента */
+    removeField.forEach((param) => delete reqQuery[param]);
+
+    // Create query string
     /* некоторые слова в Mongoose зарезирвированны
      * и чтобы коректно их использовать перед
      * ними надо добавить $*/
-    let queryStr = JSON.stringify(req.query);
+    let queryStr = JSON.stringify(reqQuery);
+
+    // Create operators ($gt, $gte, etc)
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
 
-    query = Bootcamp.find(JSON.parse(queryStr));
+    // Finding resource
+    let query = Bootcamp.find(JSON.parse(queryStr));
+
+    // Select fields
+    if (req.query.select) {
+        /* если придет select=name,description,
+         * то выведится у каждого "пользователя"
+         * _id(по умолчанию), name, description.
+         * Странно зачем в строку то делать это?
+         * => name description*/
+        const fields = req.query.select.split(',').join(' ');
+        query = query.select(fields);
+    }
+
+    // Sort fields
+    if (req.query.sort) {
+        const sortBy = req.query.sort.split(',').join(' ');
+        query = query.sort(sortBy);
+    } else {
+        query = query.sort('-createAt');
+    }
+
+    // Executing query
     const bootcamp = await query;
+    console.log(bootcamp);
 
     res.status(200).json({
         success: true,
