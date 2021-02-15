@@ -7,7 +7,15 @@ const ErrorResponce = require('../utils/errorResponce.js');
 // @route       GET /api/v1/bootcamps
 // @access      Public
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
-    const bootcamp = await Bootcamp.find();
+    let query;
+    /* некоторые слова в Mongoose зарезирвированны
+     * и чтобы коректно их использовать перед
+     * ними надо добавить $*/
+    let queryStr = JSON.stringify(req.query);
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, (match) => `$${match}`);
+
+    query = Bootcamp.find(JSON.parse(queryStr));
+    const bootcamp = await query;
 
     res.status(200).json({
         success: true,
@@ -23,12 +31,7 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
     const bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {
-        next(
-            new ErrorResponce(
-                `Bootcamp not found with id of ${req.params.id} `,
-                404
-            )
-        );
+        next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
     }
 
     res.status(200).json({
@@ -61,12 +64,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
     });
 
     if (!bootcamp) {
-        next(
-            new ErrorResponce(
-                `Bootcamp not found with id of ${req.params.id} `,
-                404
-            )
-        );
+        next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
     }
 
     res.status(200).json({
@@ -82,12 +80,7 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
     const bootcamp = await Bootcamp.findOneAndDelete(req.params.id);
 
     if (!bootcamp) {
-        next(
-            new ErrorResponce(
-                `Bootcamp not found with id of ${req.params.id} `,
-                404
-            )
-        );
+        next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
     }
 
     res.status(200).json({

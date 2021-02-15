@@ -11,6 +11,9 @@ const logger = require('./middleware/logger.js');
 const bootcamps = require('./routes/bootcamps.js');
 //#endregion *************************************
 
+// Line
+console.log(`----------------------------------------------------`.yellow);
+
 // Load env vars
 dotenv.config({ path: './config/config.env' });
 
