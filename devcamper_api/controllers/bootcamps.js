@@ -11,7 +11,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
     const reqQuery = { ...req.query };
 
     // Fileds to exclude
-    const removeField = ['select', 'sort'];
+    const removeField = ['select', 'sort', 'page', 'limit'];
 
     // Loop over removeFields and delete them from reqQuery
     /* Удаляем где есть одно из
@@ -43,7 +43,7 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
         query = query.select(fields);
     }
 
-    // Sort fields
+    // Sort
     if (req.query.sort) {
         const sortBy = req.query.sort.split(',').join(' ');
         query = query.sort(sortBy);
@@ -51,13 +51,50 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
         query = query.sort('-createAt');
     }
 
+    // Pagination
+    /* На какой странице. maxPage = total / limit округленное в большое*/
+    const page = parseInt(req.query.page, 10) || 1;
+    /* Сколько постов будет в странице */
+    const limit = parseInt(req.query.limit, 10) || 1;
+    /* Индекс самого "первого" поста на странице*/
+    const startIndex = (page - 1) * limit;
+    /* Индекс самого "последнего" поста на странице*/
+    const endIndex = page * limit;
+    /* Кол-во постов всего*/
+    const total = await Bootcamp.countDocuments();
+
+    query = query.skip(startIndex).limit(limit);
+
     // Executing query
     const bootcamp = await query;
-    console.log(bootcamp);
+
+    // Pagination result
+    const pagination = {
+        now: {
+            page,
+            startIndex,
+        },
+    };
+
+    if (endIndex < total) {
+        pagination.next = {
+            page: page + 1,
+            limit,
+        };
+    }
+
+    if (startIndex > 0) {
+        pagination.prev = {
+            page: page > total ? total : page - 1,
+            limit,
+        };
+    }
 
     res.status(200).json({
         success: true,
         count: bootcamp.length,
+        total,
+        pagination: pagination,
         data: bootcamp,
     });
 });
@@ -137,7 +174,7 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
     const loc = await geocoder.geocode(zipcode);
     const { latitude, longitude } = loc[0];
 
-    //Cala raduis using radians
+    // Calc raduis using radians
     // Divide dist by radius of Earth
     // Earth radius = 6.378 km / 3.963 mi
     const radius = distance / 3963;
