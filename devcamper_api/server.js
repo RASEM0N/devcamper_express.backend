@@ -1,9 +1,11 @@
 //#region IMPORT
+const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db.js');
 const ErrorHandler = require('./middleware/error.js');
 const colors = require('colors');
+const fileupload = require('express-fileupload');
 // Middleware
 const morgan = require('morgan');
 const logger = require('./middleware/logger.js');
@@ -29,11 +31,17 @@ const app = express();
  * req.body */
 app.use(express.json());
 
-// Dev loggin middleware
+// Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
     // app.use(logger);
 }
+
+// File upload
+app.use(fileupload());
+
+// Set static folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Mount routers
 app.use('/api/v1/bootcamps', bootcamps);
