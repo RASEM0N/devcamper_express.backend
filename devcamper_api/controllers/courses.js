@@ -15,10 +15,13 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
             bootcamp: req.params.bootcampId,
         });
     } else {
-        query = Courses.find();
+        query = Courses.find().populate({
+            path: 'bootcamp',
+            select: 'name description email',
+        });
     }
 
-    const total = await Courses.countDocuments;
+    const total = await Courses.countDocuments();
     const courses = await query;
 
     res.status(200).json({
