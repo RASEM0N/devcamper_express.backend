@@ -79,7 +79,13 @@ exports.addCourse = asyncHandler(async (req, res, next) => {
 // @route       PUT /api/v1/courses/:id
 // @access      Private
 exports.updateCourse = asyncHandler(async (req, res, next) => {
-    const course = await Courses.findByIdAndUpdate(req.params.id, req.body, {
+    const course = await Courses.findById(req.params.id);
+
+    if (!course) {
+        return next(new ErrorResponce(`Course not found with id of ${req.params.id}`, 404));
+    }
+
+    const updCours = await Courses.findByIdAndUpdate(req.params.id, req.body, {
         new: true.valueOf,
         runValidators: true,
     }).populate({
@@ -87,13 +93,9 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
         select: 'name description',
     });
 
-    if (!course) {
-        return next(new ErrorResponce(`Course not found with id of ${req.params.id}`, 404));
-    }
-
     res.status(200).json({
         success: true,
-        data: course,
+        data: updCours,
     });
 });
 
@@ -101,11 +103,13 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
 // @route       DELETE /api/v1/courses/:id
 // @access      Private
 exports.deleteCourse = asyncHandler(async (req, res, next) => {
-    const course = await Courses.findByIdAndRemove(req.params.id);
+    const course = await Courses.findById(req.params.id);
 
     if (!course) {
         return next(new ErrorResponce(`Course not found with id of ${req.params.id}`, 404));
     }
+
+    await course.remove();
 
     res.status(200).json({
         success: true,
