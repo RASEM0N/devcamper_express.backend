@@ -3,7 +3,7 @@ const Bootcamp = require('../models/Bootcamps.js');
 const geocoder = require('../utils/geocoder');
 const ErrorResponce = require('../utils/errorResponce.js');
 
-// @desc        Get all bootcamps
+// @desc        Get bootcamps
 // @route       GET /api/v1/bootcamps
 // @access      Public
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
@@ -56,7 +56,8 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
     const page = parseInt(req.query.page, 10) || 1;
     /* Сколько постов будет в странице */
     const limit = parseInt(req.query.limit, 10) || 1;
-    /* Индекс самого "первого" поста на странице*/
+    /* Индекс самого "первого" поста на странице
+     * или сколько всего постов пропустили */
     const startIndex = (page - 1) * limit;
     /* Индекс самого "последнего" поста на странице*/
     const endIndex = page * limit;
