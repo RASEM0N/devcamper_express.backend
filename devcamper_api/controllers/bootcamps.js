@@ -107,10 +107,13 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
 // @route       GET /api/v1/bootcamps/:id
 // @access      Public
 exports.getBootcamp = asyncHandler(async (req, res, next) => {
-    const bootcamp = await Bootcamp.findById(req.params.id);
+    const bootcamp = await Bootcamp.findById(req.params.id).populate({
+        path: 'courses',
+        select: 'title description tuition',
+    });
 
     if (!bootcamp) {
-        next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
+        return next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
     }
 
     res.status(200).json({
@@ -143,7 +146,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
     });
 
     if (!bootcamp) {
-        next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
+        return next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
     }
 
     res.status(200).json({
@@ -159,7 +162,7 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
     const bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {
-        next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
+        return next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
     }
 
     /* Событие на каскадное удаление не запуститься без этого */

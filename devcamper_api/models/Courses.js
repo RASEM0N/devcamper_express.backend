@@ -4,7 +4,7 @@ const CourseScheme = new mongoose.Schema({
     title: {
         type: String,
         required: [true, 'Pls add a course title'],
-        true: true,
+        unique: true,
         maxlength: [50, 'Title can not be more than 50 characters'],
     },
     description: {
