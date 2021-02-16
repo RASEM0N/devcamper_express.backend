@@ -9,7 +9,7 @@ const BootcampsScheme = new mongoose.Schema({
         required: [true, 'Please add name'],
         unique: true,
         true: true,
-        maxlength: [50, 'Name cant be more than 50 characters'],
+        maxlength: [50, 'Name can not be more than 50 characters'],
     },
     /* Удобная версия имени для URL
      * Пример: {
@@ -20,7 +20,7 @@ const BootcampsScheme = new mongoose.Schema({
     description: {
         type: String,
         required: [true, 'Please add description'],
-        maxlength: [300, 'description cant be more than 50 characters'],
+        maxlength: [300, 'Description cant be more than 300 characters'],
     },
     website: {
         type: String,
