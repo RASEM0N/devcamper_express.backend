@@ -12,6 +12,7 @@ const logger = require('./middleware/logger.js');
 // Router files
 const bootcamps = require('./routes/bootcamps.js');
 const courses = require('./routes/courses.js');
+const auth = require('./routes/auth.js');
 //#endregion *************************************
 
 // Line
@@ -46,6 +47,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Mount routers
 app.use('/api/v1/bootcamps', bootcamps);
 app.use('/api/v1/courses', courses);
+app.use('/api/v1/auth', auth);
 
 app.use(ErrorHandler);
 
