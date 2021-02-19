@@ -55,5 +55,10 @@ UserSchema.methods.getSignedJwtToken = function () {
     });
 };
 
+// Match user entered password to hashed password in database
+UserSchema.methods.matchPassword = async function (enteredPassword) {
+    /* у нас есть this.password ибо .select('+password') */
+    return await bcrypt.compare(enteredPassword, this.password);
+};
 /* Модуль User */
 module.exports = mongoose.model('User', UserSchema);
