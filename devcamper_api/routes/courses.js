@@ -9,6 +9,9 @@ const {
 const advanceResults = require('../middleware/advanceResults.js');
 const Courses = require('../models/Courses.js');
 
+/* защита на какие-то действие с бд  */
+const { protect } = require('../middleware/auth');
+
 const router = express.Router({ mergeParams: true });
 
 // Router
@@ -21,7 +24,7 @@ router
         }),
         getCourses
     )
-    .post(addCourse);
-router.route('/:id').put(updateCourse).delete(deleteCourse).get(getCourse);
+    .post(protect, addCourse);
+router.route('/:id').put(protect, updateCourse).delete(protect, deleteCourse).get(getCourse);
 
 module.exports = router;

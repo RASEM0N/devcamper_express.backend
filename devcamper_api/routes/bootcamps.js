@@ -17,14 +17,22 @@ const courseRouter = require('./courses.js');
 
 const router = express.Router();
 
+/* защита на какие-то действие с бд  */
+const { protect } = require('../middleware/auth');
+
 // Re-route into other resource routerss
 router.use('/:bootcampId/courses', courseRouter);
 
-// router /* middleware для getBootcamps*/
-router.route('/').get(advanceResults(Bootcamps, 'courses'), getBootcamps).post(createBootcamp);
-router.route('/:id').get(getBootcamp).put(updateBootcamp).delete(deleteBootcamp);
-router.route('/:id/photo').put(bootcampPhotoUpload);
+router.route('/:id/photo').put(protect, bootcampPhotoUpload);
+
 router.route('/radius/:zipcode/:distance').get(getBootcampsInRadius);
+
+// router /* middleware для getBootcamps*/
+router
+    .route('/')
+    .get(advanceResults(Bootcamps, 'courses'), getBootcamps)
+    .post(protect, createBootcamp);
+router.route('/:id').get(getBootcamp).put(protect, updateBootcamp).delete(protect, deleteBootcamp);
 
 // exports
 module.exports = router;

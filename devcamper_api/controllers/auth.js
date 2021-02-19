@@ -1,5 +1,6 @@
 const asyncHandler = require('../middleware/async.js');
 const ErrorResponce = require('../utils/errorResponce.js');
+const dotenv = require('dotenv');
 const User = require('../models/User.js');
 
 // @desc        Register user
@@ -16,12 +17,7 @@ exports.register = asyncHandler(async (req, res, next) => {
         role,
     });
 
-    // Create token
-    const token = user.getSignedJwtToken();
-    res.status(200).json({
-        success: true,
-        token,
-    });
+    sendTokenResponce(user, 200, res);
 });
 
 // @desc        Login user
@@ -53,10 +49,34 @@ exports.login = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponce('Invalid credentials', 401));
     }
 
+    sendTokenResponce(user, 200, res);
+});
+
+// Get token from model, create cookie and send responce
+const sendTokenResponce = (user, statusCode, res) => {
     // Create token
     const token = user.getSignedJwtToken();
-    res.status(200).json({
+
+    const options = {
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
+        httpOnly: true,
+    };
+
+    options.secure = process.env.NODE_ENV === 'production' ? true : false;
+
+    res.status(statusCode).cookie('token', token, options).json({
         success: true,
         token,
+    });
+};
+
+// @desc        Login user
+// @route       POST /api/v1/auth/me
+// @access      Private
+exports.getMe = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    res.status(200).json({
+        success: true,
+        data: user,
     });
 });

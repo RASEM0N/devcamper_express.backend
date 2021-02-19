@@ -6,6 +6,8 @@ const connectDB = require('./config/db.js');
 const ErrorHandler = require('./middleware/error.js');
 const colors = require('colors');
 const fileupload = require('express-fileupload');
+const cookieParser = require('cookie-parser');
+
 // Middleware
 const morgan = require('morgan');
 const logger = require('./middleware/logger.js');
@@ -31,6 +33,9 @@ const app = express();
  * Принимаем json в качастве запроса
  * req.body */
 app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
