@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 const colors = require('colors');
 
 const UserSchema = new mongoose.Schema({
@@ -24,17 +27,33 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: [true, 'Please add a password'],
         minlenght: 6,
-        maxlength: 24,
         /* не показывает пароль при запросе*/
         select: false,
     },
+
     resetPasswordToken: String,
     resetPasswordExpire: Date,
+
     createAt: {
         type: Date,
         default: Date.now,
     },
 });
+
+// Encrypt password using bcrypt
+UserSchema.pre('save', async function (next) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+});
+
+// Sign JWT and return
+/* также доступно кто вызывает User.find... или шо-то другое User.запрос */
+UserSchema.methods.getSignedJwtToken = function () {
+    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE,
+    });
+};
 
 /* Модуль User */
 module.exports = mongoose.model('User', UserSchema);
