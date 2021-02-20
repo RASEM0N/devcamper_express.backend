@@ -110,6 +110,12 @@ const BootcampsScheme = new mongoose.Schema(
             type: Date,
             default: Date.now,
         },
+        user: {
+            type: mongoose.Schema.ObjectId,
+            /* Имя модели */
+            ref: 'User',
+            required: true
+        },
     },
     {
         /* Включаение виртуализации. Данные выводятся,

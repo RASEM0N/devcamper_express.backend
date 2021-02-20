@@ -40,6 +40,7 @@ const CourseScheme = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         /* Имя модели */
         ref: 'Bootcamp',
+        required: true
     },
 });
 
