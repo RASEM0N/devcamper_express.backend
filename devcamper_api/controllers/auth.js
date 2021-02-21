@@ -2,6 +2,7 @@ const asyncHandler = require('../middleware/async.js');
 const ErrorResponce = require('../utils/errorResponce.js');
 const dotenv = require('dotenv');
 const User = require('../models/User.js');
+const sendEmail = require('../utils/sendEmail')
 
 // @desc        Register user
 // @route       POST /api/v1/auth/register
@@ -78,11 +79,38 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     // Get reset token
     const resetToken = user.getResetPasswordToken()
 
-    /* токен и дата работы токена добавятся
-     * я хз как ток */
-    user.save({
+    await user.save({
         validateBeforeSave: false
     })
+
+    // Create reset url
+    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/forgotpassword/${resetToken}`
+
+    const message = `Для восстановления пароля перейдите по ${resetUrl}`
+
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: 'Password reset token',
+            message: message
+        })
+
+        res.status(200).json({
+            success: true,
+            data: `Email sent`
+        })
+        
+    } catch (error) {
+        console.error(error);
+        user.resetPasswordToken = undefined
+        user.resetPasswordExpire = undefined
+
+        await user.save({
+            validateBeforeSave: false
+        })
+
+        return next(new ErrorResponce(`Email could not ne sent`, 500))
+    }
 
     res.status(200).json({
         success: true,
