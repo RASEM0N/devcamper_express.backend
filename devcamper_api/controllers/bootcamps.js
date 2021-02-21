@@ -63,14 +63,27 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
 // @route       PUT /api/v1/bootcamps/:id
 // @access      Private
 exports.updateBootcamp = asyncHandler(async (req, res, next) => {
-    const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
-        new: true.valueOf,
-        runValidators: true,
-    });
+    const bootcamp = await Bootcamp.findById(req.params.id);
 
     if (!bootcamp) {
         return next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
     }
+
+    // Make sure user is bootcamp owner
+    /* Если пользователь не владелец и не администратор*/
+    if (bootcamp.user.toString() !== req.res.id && req.user.role !== 'admin'){
+        return next(
+            new ErrorResponce(
+                `The user with ID ${req.user.id} is not authorize to UPDATE this bootcamp`,
+                401
+            )
+        );
+    }
+    
+    bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+        new: true.valueOf,
+        runValidators: true,
+    });
 
     res.status(200).json({
         success: true,
@@ -87,6 +100,18 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
     if (!bootcamp) {
         return next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
     }
+
+     // Make sure user is bootcamp owner
+    /* Если пользователь не владелец и не администратор*/
+    if (bootcamp.user.toString() !== req.res.id && req.user.role !== 'admin'){
+        return next(
+            new ErrorResponce(
+                `The user with ID ${req.user.id} is not authorize to DELETE this bootcamp`,
+                401
+            )
+        );
+    }
+    
 
     /* Событие на каскадное удаление не запуститься без этого */
     await bootcamp.remove();
@@ -136,6 +161,18 @@ exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
     if (!bootcamp) {
         return next(new ErrorResponce(`Bootcamp not found with id of ${req.params.id} `, 404));
     }
+
+     // Make sure user is bootcamp owner
+    /* Если пользователь не владелец и не администратор*/
+    if (bootcamp.user.toString() !== req.res.id && req.user.role !== 'admin'){
+        return next(
+            new ErrorResponce(
+                `The user with ID ${req.user.id} is not authorize to UPDATE a photo for bootcamp`,
+                401
+            )
+        );
+    }
+    
 
     if (!req.files) {
         return next(new ErrorResponce(`Plz upload a file`, 400));
