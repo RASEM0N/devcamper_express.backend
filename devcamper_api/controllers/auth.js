@@ -3,6 +3,7 @@ const ErrorResponce = require('../utils/errorResponce.js');
 const dotenv = require('dotenv');
 const User = require('../models/User.js');
 const sendEmail = require('../utils/sendEmail')
+const crypto = require('crypto')
 
 // @desc        Register user
 // @route       POST /api/v1/auth/register
@@ -84,7 +85,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     })
 
     // Create reset url
-    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/forgotpassword/${resetToken}`
+    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${resetToken}`
 
     const message = `Для восстановления пароля перейдите по ${resetUrl}`
 
@@ -116,6 +117,38 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
         success: true,
         data: user,
     });
+});
+
+// @desc        Reset password
+// @route       PUT /api/v1/auth/resetpassword/:resettoken
+// @access      Public
+exports.resetPasword = asyncHandler(async (req, res, next) => {
+    // Get hashed token
+    const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex')
+    const user = await User.findOne({
+        resetPasswordToken: resetPasswordToken,
+        /* если не просрочено дата сейчас < дата действия токена*/
+        resetPasswordExpire: {
+            $gt: Date.now()
+        }
+    });
+
+    console.log(user.email.toString());
+
+    if (!user){
+        return next(new ErrorResponce(`Invalid token`, 400))
+    }
+
+    // Set new password
+    user.password = req.body.password
+    /* Обнуление токена */
+    user.resetPasswordToken = undefined,
+    user.resetPasswordExpire = undefined
+
+    await user.save()
+
+    /* Если все заебись, то типа мы вошли */
+    sendTokenResponce(user, 200, res);
 });
 
 // Get token from model, create cookie and send responce
