@@ -16,6 +16,7 @@ const bootcamps = require('./routes/bootcamps.js');
 const courses = require('./routes/courses.js');
 const auth = require('./routes/auth.js');
 const users = require('./routes/users.js');
+const reviews = require('./routes/review.js');
 //#endregion *************************************
 
 // Line
@@ -55,6 +56,7 @@ app.use('/api/v1/bootcamps', bootcamps);
 app.use('/api/v1/courses', courses);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/auth/users', users);
+app.use('/api/v1/reviews', reviews);
 
 app.use(ErrorHandler);
 

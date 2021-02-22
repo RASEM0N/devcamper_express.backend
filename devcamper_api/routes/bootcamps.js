@@ -14,6 +14,7 @@ const Bootcamps = require('../models/Bootcamps.js');
 
 // include other resource router
 const courseRouter = require('./courses.js');
+const reviewsRouter = require('./review.js');
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ const { protect, authorize } = require('../middleware/auth');
 
 // Re-route into other resource routerss
 router.use('/:bootcampId/courses', courseRouter);
+router.use('/:bootcampId/reviews', reviewsRouter);
 
 router.route('/:id/photo').put(protect, authorize('publisher', 'admin'), bootcampPhotoUpload);
 
