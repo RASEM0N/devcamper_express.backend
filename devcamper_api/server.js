@@ -7,7 +7,9 @@ const ErrorHandler = require('./middleware/error.js');
 const colors = require('colors');
 const fileupload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
-
+// Protect request
+// https://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html
+const mongoSanitize = require('express-mongo-sanitize');
 // Middleware
 const morgan = require('morgan');
 const logger = require('./middleware/logger.js');
@@ -47,6 +49,9 @@ if (process.env.NODE_ENV === 'development') {
 
 // File upload
 app.use(fileupload());
+
+// Sanitize data
+app.use(mongoSanitize())
 
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
