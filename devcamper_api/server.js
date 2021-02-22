@@ -16,7 +16,7 @@ const bootcamps = require('./routes/bootcamps.js');
 const courses = require('./routes/courses.js');
 const auth = require('./routes/auth.js');
 const users = require('./routes/users.js');
-const reviews = require('./routes/review.js');
+const reviews = require('./routes/reviews.js');
 //#endregion *************************************
 
 // Line

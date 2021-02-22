@@ -14,7 +14,7 @@ const Bootcamps = require('../models/Bootcamps.js');
 
 // include other resource router
 const courseRouter = require('./courses.js');
-const reviewsRouter = require('./review.js');
+const reviewsRouter = require('./reviews.js');
 
 const router = express.Router();
 
